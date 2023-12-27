@@ -120,7 +120,7 @@ namespace M6A2Adats
                 ShallowCopy(ammo_M919, ammo_m791);
                 ammo_M919.Name = "M919 APFSDS-T";
                 ammo_M919.Caliber = 25;
-                ammo_M919.RhaPenetration = 112f;
+                ammo_M919.RhaPenetration = 92f;
                 ammo_M919.MuzzleVelocity = 1390f;
                 ammo_M919.Mass = 0.134f;
 
@@ -144,15 +144,15 @@ namespace M6A2Adats
                 ShallowCopy(ammo_APEX, ammo_m792);
                 ammo_APEX.Name = "APEX APHE-T";
                 ammo_APEX.Caliber = 25;
-                ammo_APEX.RhaPenetration = 15;
-                ammo_APEX.MuzzleVelocity = 970f;
+                ammo_APEX.RhaPenetration = 20f;
+                ammo_APEX.MuzzleVelocity = 1170f;
                 ammo_APEX.Mass = 0.222f;
                 ammo_APEX.TntEquivalentKg = 0.050f;
                 ammo_APEX.SpallMultiplier = 1.25f;
                 ammo_APEX.DetonateSpallCount = 30;
                 ammo_APEX.MaxSpallRha = 10f;
                 ammo_APEX.MinSpallRha = 2f;
-                ammo_APEX.ImpactFuseTime = 0.4f;
+                ammo_APEX.ImpactFuseTime = 0.04f;
 
                 ammo_codex_APEX = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_APEX.AmmoType = ammo_APEX;
@@ -180,7 +180,7 @@ namespace M6A2Adats
                 ammo_ADATS.TntEquivalentKg = 12.5f;
                 ammo_ADATS.Tandem = true;
                 ammo_ADATS.SpallMultiplier = 1.5f;
-                ammo_ADATS.TurnSpeed = 1.5f;
+                ammo_ADATS.TurnSpeed = 2.5f;
                 ammo_ADATS.DetonateSpallCount = 100;
                 ammo_ADATS.MaxSpallRha = 24;
                 ammo_ADATS.MinSpallRha = 12;
@@ -237,6 +237,9 @@ namespace M6A2Adats
 
                 PropertyInfo feedRPM = typeof(AmmoFeed).GetProperty("TotalCycleTime");
                 feedRPM.SetValue(mainGun.Feed, 0.0166f);
+
+                mainGun.Impulse = 2000;
+                mainGun.RecoilBlurMultiplier = 0.7f;
 
                 //TOW stat
                 towGun.TriggerHoldTime = 0.5f;
