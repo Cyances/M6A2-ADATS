@@ -22,7 +22,7 @@ This mod replaces the M2 Bradley with the M6 Linebacker but pretend it has the G
 	<ul> 
 		<li>Replaces the 25mm M242 Bushmaster autocannon with 25mm GAU-12/U Equalizer rotary cannon</li>
 		<li>Replaces the BGM-71C I-TOW with the MIM-146 ADATS</li>
-		<li>GAU-12/U Equalizer: 3600 RPM, 1500 rounds (300 AP/1200 APHE</li>
+		<li>GAU-12/U Equalizer: 3600 RPM, 1500 rounds (300 AP/1200 APHE)</li>
 		<li>M919 APFSDS-T: 1390 m/s velocity and 112 mm RHA penetration</li>
 		<li>APEX APHE-T: 970 m/s velocity and 15 mm RHA penetration</li>
 		<li>MIM-146 ADATS: 1020 m/s velocity and 1000 mm RHA penetration</li>
