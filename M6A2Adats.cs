@@ -233,7 +233,7 @@ namespace M6A2Adats
                 mainGun.FCS.MaxLaserRange = 10000;
 
                 //M242 stats
-                mainGunInfo.Name = "25mm GAU-12/U Equalizer";
+                mainGunInfo.Name = "25mm gun GAU-12/U Equalizer";
                 mainGun.SetCycleTime(0.0166f); //3600 RPM
                 mainGun.BaseDeviationAngle = 0.045f;
 
