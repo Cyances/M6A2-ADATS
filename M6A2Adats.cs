@@ -233,18 +233,23 @@ namespace M6A2Adats
                 mainGun.FCS.MaxLaserRange = 10000;
 
                 //M242 stats
+                mainGunInfo.Name = "25mm GAU-12/U Equalizer";
                 mainGun.SetCycleTime(0.0166f); //3600 RPM
+                mainGun.BaseDeviationAngle = 0.045f;
 
                 PropertyInfo feedRPM = typeof(AmmoFeed).GetProperty("TotalCycleTime");
                 feedRPM.SetValue(mainGun.Feed, 0.0166f);
 
                 mainGun.Impulse = 2000;
-                mainGun.RecoilBlurMultiplier = 0.7f;
+                mainGun.RecoilBlurMultiplier = 0.5f;
 
                 //TOW stat
-                towGun.TriggerHoldTime = 0.5f;
+                towGunInfo.Name = "ADATS Launcher";
+                towGun.TriggerHoldTime = 1.0f;
                 towGun.MaxSpeedToFire = 999f;
                 towGun.MaxSpeedToDeploy = 999f;
+                towGun.RecoilBlurMultiplier = 0.2f;
+                towGun.FireWhileGuidingMissile = true;
                 vic.AimablePlatforms[2].ForcedStowSpeed = 999f;
 
                 LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
