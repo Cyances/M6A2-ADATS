@@ -175,7 +175,7 @@ namespace M6A2Adats
                 ammo_ADATS.Name = "MIM-146 ADATS";
                 ammo_ADATS.Caliber = 152;
                 ammo_ADATS.RhaPenetration = 1000f;
-                ammo_ADATS.MuzzleVelocity = 1020f;
+                ammo_ADATS.MuzzleVelocity = 510f;
                 ammo_ADATS.Mass = 51f;
                 ammo_ADATS.TntEquivalentKg = 12.5f;
                 ammo_ADATS.Tandem = true;
@@ -185,7 +185,7 @@ namespace M6A2Adats
                 ammo_ADATS.MaxSpallRha = 24;
                 ammo_ADATS.MinSpallRha = 12;
                 ammo_ADATS.MaximumRange = 10000;
-                ammo_ADATS.ImpactFuseTime = 10; //max flight time is 10 secs
+                ammo_ADATS.ImpactFuseTime = 20; //max flight time is 20 secs
 
                 ammo_codex_ADATS = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_ADATS.AmmoType = ammo_ADATS;
