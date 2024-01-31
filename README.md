@@ -1,7 +1,11 @@
 # M6A2 ADATS v1.0
 
 This mod replaces the M2 Bradley with the M6 Linebacker but pretend it has the GAU-12 and ADATS instead!
-# Features:
+
+## NOTE
+No release version is currently compatible with GHPC v20240124
+
+## Features:
 
 
 <p>
