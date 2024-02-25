@@ -1,0 +1,8 @@
+
+*.vsidx
+.vs/M6A2Adats/v17/.suo
+bin/Debug/Assembly-CSharp.dll
+bin/Debug/AwesomeTechnologies.VegetationStudioPro.Runtime.dll
+*.dll
+*.dll
+obj/Debug/M6A2Adats.csproj.AssemblyReference.cache

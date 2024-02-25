@@ -95,15 +95,17 @@ namespace M6A2Adats
 
         public override async void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
-            if (sceneName == "LOADER_INITIAL" || sceneName == "MainMenu2_Scene" || sceneName == "t64_menu") return;
+            if (sceneName == "MainMenu2_Scene" || sceneName == "LOADER_MENU" || sceneName == "LOADER_INITIAL" || sceneName == "t64_menu") return;
 
             vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
 
             while (vic_gos.Length == 0)
             {
                 vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
-                await Task.Delay(3000);
+                await Task.Delay(1);
             }
+
+            await Task.Delay(3000);
 
             if (ammo_M919 == null)
             {
@@ -120,7 +122,7 @@ namespace M6A2Adats
                 ShallowCopy(ammo_M919, ammo_m791);
                 ammo_M919.Name = "M919 APFSDS-T";
                 ammo_M919.Caliber = 25;
-                ammo_M919.RhaPenetration = 92f;
+                ammo_M919.RhaPenetration = 102f;
                 ammo_M919.MuzzleVelocity = 1390f;
                 ammo_M919.Mass = 0.134f;
 
@@ -150,7 +152,7 @@ namespace M6A2Adats
                 ammo_APEX.TntEquivalentKg = 0.050f;
                 ammo_APEX.SpallMultiplier = 1.25f;
                 ammo_APEX.DetonateSpallCount = 30;
-                ammo_APEX.MaxSpallRha = 10f;
+                ammo_APEX.MaxSpallRha = 12f;
                 ammo_APEX.MinSpallRha = 2f;
                 ammo_APEX.ImpactFuseTime = 0.04f;
 
@@ -216,8 +218,8 @@ namespace M6A2Adats
                 FieldInfo friendlyName = typeof(GHPC.Unit).GetField("_friendlyName", BindingFlags.NonPublic | BindingFlags.Instance);
                 friendlyName.SetValue(vic, name);
 
-                FieldInfo uniqueName = typeof(GHPC.Unit).GetField("_uniqueName", BindingFlags.NonPublic | BindingFlags.Instance);
-                uniqueName.SetValue(vic, name);
+                /*FieldInfo uniqueName = typeof(GHPC.Unit).GetField("_uniqueName", BindingFlags.NonPublic | BindingFlags.Instance);
+                uniqueName.SetValue(vic, name);*/
 
                 WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                 WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
@@ -234,18 +236,18 @@ namespace M6A2Adats
 
                 //M242 stats
                 mainGunInfo.Name = "25mm gun GAU-12/U Equalizer";
-                mainGun.SetCycleTime(0.0166f); //3600 RPM
+                mainGun.SetCycleTime(0.1f); //3600 RPM
                 mainGun.BaseDeviationAngle = 0.045f;
 
-                PropertyInfo feedRPM = typeof(AmmoFeed).GetProperty("TotalCycleTime");
-                feedRPM.SetValue(mainGun.Feed, 0.0166f);
+                PropertyInfo feedRPM = typeof(AmmoFeed).GetProperty("_totalCycleTime");
+                feedRPM.SetValue(mainGun.Feed, 0.1f);
 
                 mainGun.Impulse = 2000;
                 mainGun.RecoilBlurMultiplier = 0.5f;
 
                 //TOW stat
                 towGunInfo.Name = "ADATS Launcher";
-                towGun.TriggerHoldTime = 1.0f;
+                towGun.TriggerHoldTime = 0.5f;
                 towGun.MaxSpeedToFire = 999f;
                 towGun.MaxSpeedToDeploy = 999f;
                 towGun.RecoilBlurMultiplier = 0.2f;
@@ -261,8 +263,6 @@ namespace M6A2Adats
 
                 towRack.StoredClips[0] = clip_ADATS;
                 towRack.StoredClips[1] = clip_ADATS;
-                towRack.StoredClips[2] = clip_ADATS;
-                towRack.StoredClips[3] = clip_ADATS;
 
                 for (int i = 0; i <= 1; i++)
                 {
@@ -304,6 +304,10 @@ namespace M6A2Adats
                 }
 
                 optic.slot.BaseBlur = 0;
+                optic.RotateAzimuth = true;
+                optic.RotateElevation = true;
+                optic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true;
+                optic.slot.LinkedNightSight.PairedOptic.RotateElevation = true;
             }
         }
     }
