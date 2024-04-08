@@ -1,12 +1,8 @@
-# M6A2 ADATS v1.0
+# M6A2 ADATS v1.1
 
 This mod replaces the M2 Bradley with the M6 Linebacker but pretend it has the GAU-12 and ADATS instead!
 
-## NOTE
-No release version is currently compatible with GHPC v20240124
-
 ## Features:
-
 
 <p>
 	<ul> 
@@ -14,19 +10,26 @@ No release version is currently compatible with GHPC v20240124
 		<li>Replaces the 25mm M242 Bushmaster autocannon with 25mm GAU-12/U Equalizer rotary cannon</li>
 		<li>Replaces the BGM-71C I-TOW with the MIM-146 ADATS</li>
 		<li>GAU-12/U Equalizer: 3600 RPM and 1500 rounds (300 AP/1200 APHE)</li>
-		<li>M919 APFSDS-T: 1390 m/s velocity and 112 mm RHA penetration</li>
-		<li>APEX APHE-T: 970 m/s velocity and 15 mm RHA penetration</li>
-		<li>MIM-146 ADATS: 1020 m/s velocity, 1000 mm RHA penetration amd 10 km max range. 4 ready to launch (imagine two tubes on each side of the turret) and 16 stowed</li>
+		<li>M919 APFSDS-T: 1390 m/s velocity and 102 mm RHA penetration</li>
+		<li>APEX APHE-T: 1270 m/s velocity and 35 mm RHA penetration</li>
+		<li>MIM-146 ADATS: 510 m/s velocity, 1000 mm RHA penetration amd 10 km max range. 4 ready to launch (imagine two tubes on each side of the turret) and 12 stowed</li>
+		<li>Option for ADATS tandem warhead</li>
+		<li>Option for super optics (main/thermals)</li>
+		<li>Option for better vehicle dynamics (engine/transmission/suspension/tracks)</li>
+		<li>Option for better AI (faster spotting and improved AI gun accuracy</li>
 	</ul>
 </p>
+
+## Installation:
+1.) Install [MelonLoader v0.6.1](https://github.com/LavaGang/MelonLoader/).
+
+2.) Download the latest version from the [release page](https://github.com/Cyances/M6A2-ADATS/releases).
+
+3.) Place zM6A2Adats.dll file in the mods folder:
+
+4.) Launch the game directly (not from Steam).
+   
+5.) On first time running this mod, the entries in MelonPreferences.cfg will only appear after launching the game then closing it.
+
 
 Special thanks to Swiss (https://github.com/SovGrenadier) for allowing the forking of this mod and ATLAS (https://github.com/thebeninator) for assisting with some of the code.
-
-<p>
-	<ul> 
-		<li>Requires MelonLoader, instructions for download here: https://www.youtube.com/watch?v=LbIHolAu5CE at roughly 0:34. Melonloader is found on github through a simple search.</li>
-		<li>Download the latest release</li>
-		<li>Drop the .dll in the mod folder of your GHPC game.</li>
-		<li>Run the .exe directly from the game directory. *IT WILL NOT WORK THORUGH STEAM!*</li>
-	</ul>
-</p>
