@@ -23,3 +23,8 @@ bin/Debug/M6A2Adats.pdb
 bin/Debug/Newtonsoft.Json.dll
 *.cache
 *.pdb
+/.vs
+/bin
+*.pdb
+*.txt
+*.cache
