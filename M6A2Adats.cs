@@ -21,9 +21,8 @@ using GHPC.State;
 using GHPC.Utility;
 using System.Collections;
 using GHPC.AI;
-using M6A2Adats;
 
-[assembly: MelonInfo(typeof(M6A2_Adats), "Z M6A2", "1.1", "Cyance and Schweiz")]
+[assembly: MelonInfo(typeof(M6A2_Adats), "Z M6A2", "1.1.0", "Cyance and Schweiz")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 
@@ -58,17 +57,19 @@ namespace M6A2Adats
 
 
         MelonPreferences_Category cfg;
-        static MelonPreferences_Entry<bool> adatsTandem,betterOptics, betterDynamics;
+        static MelonPreferences_Entry<bool> adatsTandem, superOptics, betterDynamics, betterAI;
 
         public override void OnInitializeMelon()
         {
             cfg = MelonPreferences.CreateCategory("ADATSConfig");
             adatsTandem = cfg.CreateEntry<bool>("ADATSTandem", false);
             adatsTandem.Description = "Better ERA defeat for ADATS";
-            betterOptics = cfg.CreateEntry<bool>("BetterOptics", false);
-            betterOptics.Description = "More zoom levels/clearer image for main and thermal sights";
+            superOptics = cfg.CreateEntry<bool>("SuperOptics", false);
+            superOptics.Description = "More zoom levels/clearer image for main and thermal sights";
             betterDynamics = cfg.CreateEntry<bool>("BetterDynamics", false);
             betterDynamics.Description = "Better engine/transmission/suspension/tracks";
+            betterAI = cfg.CreateEntry<bool>("BetterAI", false);
+            betterAI.Description = "Better AI spotting and gunnery";
         }
 
         public IEnumerator Convert(GameState _)
@@ -309,6 +310,7 @@ namespace M6A2Adats
 
                 mainGun.Feed._totalCycleTime = 0.0166f;//3600
 
+                towGunInfo.Name = "ADATS Launcher";
                 towGun.TriggerHoldTime = 0.5f;
                 towGun.MaxSpeedToFire = 999f;
                 towGun.MaxSpeedToDeploy = 999f;
@@ -376,7 +378,7 @@ namespace M6A2Adats
                 CameraSlot daysightPlus = gpsOptic.GetComponent<CameraSlot>();
                 CameraSlot flirPlus = flirOptic.GetComponent<CameraSlot>();
 
-                if (betterOptics.Value)
+                if (superOptics.Value)
                 {
                     daysightPlus.DefaultFov = 16.5f;//8
                     daysightPlus.OtherFovs = new float[] { 8f, 5.5f, 4f, 2.5f, 1.25f, 0.5f };//2.5
@@ -388,26 +390,27 @@ namespace M6A2Adats
                     flirPlus.OtherFovs = new float[] { 8f, 5.5f, 4f, 2.5f, 1.25f, 0.5f };//2.5
                     flirPlus.BaseBlur = 0;
                     flirPlus.VibrationBlurScale = 0;
+                    GameObject.Destroy(flirOptic.transform.Find("Canvas Scanlines").gameObject);
                 }
 
                 //Vehicle dynamics under testing
-                VehicleController m3a2Vc = vic_go.GetComponent<VehicleController>();
-                NwhChassis m3a2Chassis = vic_go.GetComponent<NwhChassis>();
-                UnitAI m2Ai = vic.GetComponentInChildren<UnitAI>();
-                DriverAIController m2dAic = vic.GetComponent<DriverAIController>();
+                VehicleController m6a2Vc = vic_go.GetComponent<VehicleController>();
+                NwhChassis m6a2Chassis = vic_go.GetComponent<NwhChassis>();
+                UnitAI m6a2Ai = vic.GetComponentInChildren<UnitAI>();
+                DriverAIController m6a2dAic = vic.GetComponent<DriverAIController>();
 
                 if (betterDynamics.Value)
                 {
-                    m2dAic.maxSpeed = 32;//20
+                    m6a2dAic.maxSpeed = 32;//20
 
-                    m3a2Vc.engine.maxPower = 1200f;//530;
-                    m3a2Vc.engine.maxRPM = 4500f;//4000 ;
-                    m3a2Vc.engine.maxRpmChange = 3000f;//2000;
+                    m6a2Vc.engine.maxPower = 1200f;//530;
+                    m6a2Vc.engine.maxRPM = 4500f;//4000 ;
+                    m6a2Vc.engine.maxRpmChange = 3000f;//2000;
 
-                    m3a2Vc.brakes.maxTorque = 55590;//49590
+                    m6a2Vc.brakes.maxTorque = 55590;//49590
 
-                    m3a2Chassis._maxForwardSpeed = 32f;//16.4
-                    m3a2Chassis._maxReverseSpeed = 16f;//4.47
+                    m6a2Chassis._maxForwardSpeed = 32f;//16.4
+                    m6a2Chassis._maxReverseSpeed = 16f;//4.47
 
 
                     List<float> fwGears = new List<float>();
@@ -435,58 +438,60 @@ namespace M6A2Adats
                     Gears.Add(1.36f);
                     Gears.Add(1.16f);
 
-                    m3a2Vc.transmission.forwardGears = fwGears;//5 2.4 1.9 1.6 1.4 1.2
-                    m3a2Vc.transmission.gearMultiplier = 9.918f;//9.918
-                    m3a2Vc.transmission.gears = Gears;//
-                    m3a2Vc.transmission.reverseGears = rvGears;//-8
-                    m3a2Vc.transmission.shiftDuration = 0.1f;//.309
-                    m3a2Vc.transmission.shiftDurationRandomness = 0f;//.2
-                    m3a2Vc.transmission.shiftPointRandomness = 0.05f;//.05
+                    m6a2Vc.transmission.forwardGears = fwGears;//5 2.4 1.9 1.6 1.4 1.2
+                    m6a2Vc.transmission.gearMultiplier = 9.918f;//9.918
+                    m6a2Vc.transmission.gears = Gears;//
+                    m6a2Vc.transmission.reverseGears = rvGears;//-8
+                    m6a2Vc.transmission.shiftDuration = 0.1f;//.309
+                    m6a2Vc.transmission.shiftDurationRandomness = 0f;//.2
+                    m6a2Vc.transmission.shiftPointRandomness = 0.05f;//.05
 
 
                     for (int i = 0; i < 12; i++)
                     {
                         //m3a2Vc.wheels[i].wheelController.damper.force = 2.3036f;//2.3036
-                        m3a2Vc.wheels[i].wheelController.damper.maxForce = 6500;//6500
-                        m3a2Vc.wheels[i].wheelController.damper.unitBumpForce = 6500;//6500
-                        m3a2Vc.wheels[i].wheelController.damper.unitReboundForce = 9000;//9000
+                        m6a2Vc.wheels[i].wheelController.damper.maxForce = 6500;//6500
+                        m6a2Vc.wheels[i].wheelController.damper.unitBumpForce = 6500;//6500
+                        m6a2Vc.wheels[i].wheelController.damper.unitReboundForce = 9000;//9000
 
                         //m3a2Vc.wheels[i].wheelController.spring.bottomOutForce = 0f;//0
-                        m3a2Vc.wheels[i].wheelController.spring.force = 24079.51f;//24079.51
-                        m3a2Vc.wheels[i].wheelController.spring.length = 0.32f;//0.2809
-                        m3a2Vc.wheels[i].wheelController.spring.maxForce = 100000;//100000
-                        m3a2Vc.wheels[i].wheelController.spring.maxLength = 0.58f;//0.48
+                        m6a2Vc.wheels[i].wheelController.spring.force = 24079.51f;//24079.51
+                        m6a2Vc.wheels[i].wheelController.spring.length = 0.32f;//0.2809
+                        m6a2Vc.wheels[i].wheelController.spring.maxForce = 100000;//100000
+                        m6a2Vc.wheels[i].wheelController.spring.maxLength = 0.58f;//0.48
 
-                        m3a2Vc.wheels[i].wheelController.fFriction.forceCoefficient = 1.25f;//1.2
-                        m3a2Vc.wheels[i].wheelController.fFriction.slipCoefficient = 1f;//1
+                        m6a2Vc.wheels[i].wheelController.fFriction.forceCoefficient = 1.25f;//1.2
+                        m6a2Vc.wheels[i].wheelController.fFriction.slipCoefficient = 1f;//1
 
-                        m3a2Vc.wheels[i].wheelController.sFriction.forceCoefficient = 0.85f;//0.8
-                        m3a2Vc.wheels[i].wheelController.sFriction.slipCoefficient = 1f;//1 
+                        m6a2Vc.wheels[i].wheelController.sFriction.forceCoefficient = 0.85f;//0.8
+                        m6a2Vc.wheels[i].wheelController.sFriction.slipCoefficient = 1f;//1 
                     }
                 }
 
 
-                //Better AI under testing
-                /*m2Ai.SpotTimeMaxDistance = 4000;
-                m2Ai.TargetSensor._spotTimeMax = 2;
-                m2Ai.TargetSensor._spotTimeMaxDistance = 500;
-                m2Ai.TargetSensor._spotTimeMaxVelocity = 10f;
-                m2Ai.TargetSensor._spotTimeMin = 1;
-                m2Ai.TargetSensor._spotTimeMinDistance = 50;
-                m2Ai.TargetSensor._targetCooldownTime = 1f;
+                if (betterAI.Value)
+                {
+                    m6a2Ai.SpotTimeMaxDistance = 3500;
+                    m6a2Ai.TargetSensor._spotTimeMax = 3;
+                    m6a2Ai.TargetSensor._spotTimeMaxDistance = 500;
+                    m6a2Ai.TargetSensor._spotTimeMaxVelocity = 7f;
+                    m6a2Ai.TargetSensor._spotTimeMin = 1;
+                    m6a2Ai.TargetSensor._spotTimeMinDistance = 50;
+                    m6a2Ai.TargetSensor._targetCooldownTime = 1.5f;
 
-                m2Ai.CommanderAI._identifyTargetDurationRange = new Vector2(1f, 2f);
-                m2Ai.CommanderAI._sweepCommsCheckDuration = 3;
+                    m6a2Ai.CommanderAI._identifyTargetDurationRange = new Vector2(1.5f, 2.5f);
+                    m6a2Ai.CommanderAI._sweepCommsCheckDuration = 4;
 
 
-                m2Ai.combatSpeedLimit = 25;
-                m2Ai.firingSpeedLimit = 20;
+                    m6a2Ai.combatSpeedLimit = 25;
+                    m6a2Ai.firingSpeedLimit = 20;
 
-                //m2Ai.AccuracyModifiers.Angle._radius = 2.4f;
-                m2Ai.AccuracyModifiers.Angle.MaxDistance = 1500;
-                m2Ai.AccuracyModifiers.Angle.MaxRadius = 5f;
-                m2Ai.AccuracyModifiers.Angle.MinRadius = 2.5f;
-                m2Ai.AccuracyModifiers.Angle.IncreaseAccuracyPerShot = false;*/
+                    //m2Ai.AccuracyModifiers.Angle._radius = 2.4f;
+                    m6a2Ai.AccuracyModifiers.Angle.MaxDistance = 1500;
+                    m6a2Ai.AccuracyModifiers.Angle.MaxRadius = 5f;
+                    m6a2Ai.AccuracyModifiers.Angle.MinRadius = 2f;
+                    m6a2Ai.AccuracyModifiers.Angle.IncreaseAccuracyPerShot = false;
+                }
             }
             yield break;
         }
@@ -589,11 +594,12 @@ namespace M6A2Adats
                 clip_codex_ADATS.name = "clip_TOW_2A";
                 clip_codex_ADATS.ClipType = clip_ADATS;
 
-                // MK210 HEI-T
+                // APEX APHE-T
 
                 ammo_APEX = new AmmoType();
                 Util.ShallowCopy(ammo_APEX, ammo_m792);
                 ammo_APEX.Name = "APEX APHE-T";
+                ammo_APEX.Coeff = 0.1f;
                 ammo_APEX.Caliber = 25;
                 ammo_APEX.RhaPenetration = 35f;
                 ammo_APEX.MuzzleVelocity = 1270f;

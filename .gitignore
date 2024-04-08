@@ -28,3 +28,8 @@ bin/Debug/Newtonsoft.Json.dll
 *.pdb
 *.txt
 *.cache
+/.vs
+/.vs
+*.cache
+/.vs
+/obj
