@@ -15,3 +15,11 @@ bin/Debug/M6A2Adats.pdb
 obj/Debug/M6A2Adats.csproj.AssemblyReference.cache
 obj/Debug/M6A2Adats.dll
 obj/Debug/M6A2Adats.pdb
+*.vsidx
+*.vsidx
+.vs/M6A2Adats/v17/.suo
+bin/Debug/AwesomeTechnologies.VegetationStudioPro.Runtime.dll
+bin/Debug/M6A2Adats.pdb
+bin/Debug/Newtonsoft.Json.dll
+*.cache
+*.pdb

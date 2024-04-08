@@ -35,8 +35,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\Program Files\SteamLibrary\steamapps\common\Gunner HEAT PC\Bin\MelonLoader\net35\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>D:\Program Files\SteamLibrary\steamapps\common\Gunner HEAT PC\Bin\GHPC_Data\Managed\Assembly-CSharp.dll</HintPath>
+	  <Reference Include="Assembly-CSharp_publicized">
+		  <HintPath>C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M1A1AbramsAMP\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="MelonLoader">
       <HintPath>D:\Program Files\SteamLibrary\steamapps\common\Gunner HEAT PC\Bin\MelonLoader\net35\MelonLoader.dll</HintPath>

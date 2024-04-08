@@ -120,7 +120,6 @@ C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M3A3-Bradley-GHPC-1.0.0\obj
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\M6A2Adats.dll
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\M6A2Adats.pdb
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\0Harmony.dll
-C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\Assembly-CSharp.dll
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\MelonLoader.dll
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\UnityEngine.CoreModule.dll
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\UnityEngine.dll
@@ -236,3 +235,4 @@ C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\obj\Debug\M6A2Ad
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\obj\Debug\M6A2Adats.csproj.CopyComplete
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\obj\Debug\M6A2Adats.dll
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\obj\Debug\M6A2Adats.pdb
+C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\Assembly-CSharp_publicized.dll

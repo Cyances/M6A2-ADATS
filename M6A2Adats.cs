@@ -122,16 +122,19 @@ namespace M6A2Adats
                 ShallowCopy(ammo_M919, ammo_m791);
                 ammo_M919.Name = "M919 APFSDS-T";
                 ammo_M919.Caliber = 25;
-                ammo_M919.RhaPenetration = 102f;
-                ammo_M919.MuzzleVelocity = 1390f;
+                ammo_M919.RhaPenetration = 135f;
+                ammo_M919.MuzzleVelocity = 1590f;
                 ammo_M919.Mass = 0.134f;
+                ammo_M919.SpallMultiplier = 1.5f;
+                ammo_M919.MaxSpallRha = 12f;
+                ammo_M919.MinSpallRha = 4f;
 
                 ammo_codex_M919 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_M919.AmmoType = ammo_M919;
                 ammo_codex_M919.name = "ammo_M919";
 
                 clip_M919 = new AmmoType.AmmoClip();
-                clip_M919.Capacity = 300;
+                clip_M919.Capacity = 900;
                 clip_M919.Name = "M919 APFSDS-T";
                 clip_M919.MinimalPattern = new AmmoCodexScriptable[1];
                 clip_M919.MinimalPattern[0] = ammo_codex_M919;
@@ -146,22 +149,22 @@ namespace M6A2Adats
                 ShallowCopy(ammo_APEX, ammo_m792);
                 ammo_APEX.Name = "APEX APHE-T";
                 ammo_APEX.Caliber = 25;
-                ammo_APEX.RhaPenetration = 20f;
-                ammo_APEX.MuzzleVelocity = 1170f;
+                ammo_APEX.RhaPenetration = 30f;
+                ammo_APEX.MuzzleVelocity = 1270f;
                 ammo_APEX.Mass = 0.222f;
                 ammo_APEX.TntEquivalentKg = 0.050f;
                 ammo_APEX.SpallMultiplier = 1.25f;
                 ammo_APEX.DetonateSpallCount = 30;
                 ammo_APEX.MaxSpallRha = 12f;
                 ammo_APEX.MinSpallRha = 2f;
-                ammo_APEX.ImpactFuseTime = 0.04f;
+                //ammo_APEX.ImpactFuseTime = 0.04f;
 
                 ammo_codex_APEX = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_APEX.AmmoType = ammo_APEX;
                 ammo_codex_APEX.name = "ammo_APEX";
 
                 clip_APEX = new AmmoType.AmmoClip();
-                clip_APEX.Capacity = 1200;
+                clip_APEX.Capacity = 600;
                 clip_APEX.Name = "APEX APHE-T";
                 clip_APEX.MinimalPattern = new AmmoCodexScriptable[1];
                 clip_APEX.MinimalPattern[0] = ammo_codex_APEX;
@@ -236,11 +239,15 @@ namespace M6A2Adats
 
                 //M242 stats
                 mainGunInfo.Name = "25mm gun GAU-12/U Equalizer";
-                mainGun.SetCycleTime(0.1f); //3600 RPM
+                mainGun.SetCycleTime(0.0166f); //3600 
                 mainGun.BaseDeviationAngle = 0.045f;
 
-                PropertyInfo feedRPM = typeof(AmmoFeed).GetProperty("_totalCycleTime");
-                feedRPM.SetValue(mainGun.Feed, 0.1f);
+                //TotalCycleTime
+                //_TotalCycleTime
+                FieldInfo feedRPM = typeof(AmmoFeed).GetField("TotalCycleTime");
+                feedRPM.SetValue(mainGun.Feed, 0.0166f);
+
+                //mainGun.Feed._totalCycleTime = 0.0166f;
 
                 mainGun.Impulse = 2000;
                 mainGun.RecoilBlurMultiplier = 0.5f;
@@ -263,6 +270,7 @@ namespace M6A2Adats
 
                 towRack.StoredClips[0] = clip_ADATS;
                 towRack.StoredClips[1] = clip_ADATS;
+                towRack.StoredClips[2] = clip_ADATS;
 
                 for (int i = 0; i <= 1; i++)
                 {
