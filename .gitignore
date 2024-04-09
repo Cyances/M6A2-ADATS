@@ -33,3 +33,6 @@ bin/Debug/Newtonsoft.Json.dll
 *.cache
 /.vs
 /obj
+/obj
+/bin
+/.vs

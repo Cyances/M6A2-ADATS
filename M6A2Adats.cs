@@ -31,33 +31,33 @@ namespace M6A2Adats
     public class M6A2_Adats : MelonMod
     {
 
-        GameObject[] vic_gos;
-        GameObject gameManager;
-        CameraManager cameraManager;
-        PlayerInput playerManager;
+        public static GameObject[] vic_gos;
+        public static GameObject gameManager;
+        public static CameraManager cameraManager;
+        public static PlayerInput playerManager;
 
-        AmmoClipCodexScriptable clip_codex_M919;
-        AmmoType.AmmoClip clip_M919;
-        AmmoCodexScriptable ammo_codex_M919;
-        AmmoType ammo_M919;
+        public static AmmoClipCodexScriptable clip_codex_M919;
+        public static AmmoType.AmmoClip clip_M919;
+        public static AmmoCodexScriptable ammo_codex_M919;
+        public static AmmoType ammo_M919;
 
-        AmmoClipCodexScriptable clip_codex_ADATS;
-        AmmoType.AmmoClip clip_ADATS;
-        AmmoCodexScriptable ammo_codex_ADATS;
-        AmmoType ammo_ADATS;
+        public static AmmoClipCodexScriptable clip_codex_ADATS;
+        public static AmmoType.AmmoClip clip_ADATS;
+        public static AmmoCodexScriptable ammo_codex_ADATS;
+        public static AmmoType ammo_ADATS;
 
-        AmmoClipCodexScriptable clip_codex_APEX;
-        AmmoType.AmmoClip clip_APEX;
-        AmmoCodexScriptable ammo_codex_APEX;
-        AmmoType ammo_APEX;
+        public static AmmoClipCodexScriptable clip_codex_APEX;
+        public static AmmoType.AmmoClip clip_APEX;
+        public static AmmoCodexScriptable ammo_codex_APEX;
+        public static AmmoType ammo_APEX;
 
-        AmmoType ammo_m791;
-        AmmoType ammo_m792;
-        AmmoType ammo_I_TOW;
+        public static AmmoType ammo_m791;
+        public static AmmoType ammo_m792;
+        public static AmmoType ammo_I_TOW;
 
 
-        MelonPreferences_Category cfg;
-        static MelonPreferences_Entry<bool> adatsTandem, superOptics, betterDynamics, betterAI;
+        public static MelonPreferences_Category cfg;
+        static MelonPreferences_Entry<bool> adatsTandem, superOptics, betterDynamics, betterAI, compositeTurret, compositeHull;
 
         public override void OnInitializeMelon()
         {
@@ -70,9 +70,12 @@ namespace M6A2Adats
             betterDynamics.Description = "Better engine/transmission/suspension/tracks";
             betterAI = cfg.CreateEntry<bool>("BetterAI", false);
             betterAI.Description = "Better AI spotting and gunnery";
+            compositeHull = cfg.CreateEntry<bool>("CompositeHull", false);
+            compositeHull.Description = "50% better protection with no weight penalty";
+            compositeTurret = cfg.CreateEntry<bool>("CompositeTurret", false);
         }
 
-        public IEnumerator Convert(GameState _)
+        public static IEnumerator Convert(GameState _)
         {
             vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
             gameManager = GameObject.Find("_APP_GHPC_");
@@ -81,7 +84,7 @@ namespace M6A2Adats
 
             ////UniformArmor pieces
             ///Extra armor under testing
-            /*foreach (GameObject armour in GameObject.FindGameObjectsWithTag("Penetrable"))
+            foreach (GameObject armour in GameObject.FindGameObjectsWithTag("Penetrable"))
             {
                 if (armour == null) continue;
 
@@ -90,61 +93,66 @@ namespace M6A2Adats
                 if (m2UA.Unit == null) continue;
                 if (m2UA.Unit.FriendlyName == "M2 Bradley")
                 {
-                    if (m2UA.Name == "turret face")
+                    if (compositeTurret.Value)
                     {
-                        m2UA.PrimaryHeatRha = 80f;
-                        m2UA.PrimarySabotRha = 80f;
+                        if (m2UA.Name == "turret face")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "turret side")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "turret rear")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "turret roof")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "turret bottom")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "turret inner frame")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "turret ring collar")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "gun mantlet")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "trunnion shield")
+                        {
+                            m2UA.PrimaryHeatRha = 12.7f;
+                            m2UA.PrimarySabotRha = 12.7f;
+                        }
                     }
 
-                    if (m2UA.Name == "turret side")
-                    {
-                        m2UA.PrimaryHeatRha = 80f;
-                        m2UA.PrimarySabotRha = 80f;
-                    }
-                    if (m2UA.Name == "turret rear")
-                    {
-                        m2UA.PrimaryHeatRha = 80f;
-                        m2UA.PrimarySabotRha = 80f;
-                    }
-
-                    if (m2UA.Name == "turret roof")
-                    {
-                        m2UA.PrimaryHeatRha = 76.2f;
-                        m2UA.PrimarySabotRha = 76.2f;
-                    }
-                    if (m2UA.Name == "turret bottom")
-                    {
-                        m2UA.PrimaryHeatRha = 76.2f;
-                        m2UA.PrimarySabotRha = 76.2f;
-                    }
-
-                    if (m2UA.Name == "turret inner frame")
+                    /*if (m2UA.Name == "machine gun sleeve")
                     {
                         m2UA.PrimaryHeatRha = 38.1f;
                         m2UA.PrimarySabotRha = 38.1f;
                     }
-                    if (m2UA.Name == "turret ring collar")
-                    {
-                        m2UA.PrimaryHeatRha = 38.1f;
-                        m2UA.PrimarySabotRha = 38.1f;
-                    }
 
-                    if (m2UA.Name == "gun mantlet")
-                    {
-                        m2UA.PrimaryHeatRha = 80;
-                        m2UA.PrimarySabotRha = 80f;
-                    }
-                    if (m2UA.Name == "trunnion shield")
-                    {
-                        m2UA.PrimaryHeatRha = 12.7f;
-                        m2UA.PrimarySabotRha = 12.7f;
-                    }
-
-                    if (m2UA.Name == "machine gun sleeve")
-                    {
-                        m2UA.PrimaryHeatRha = 38.1f;
-                        m2UA.PrimarySabotRha = 38.1f;
-                    }
                     if (m2UA.Name == "cannon sleeve")
                     {
                         m2UA.PrimaryHeatRha = 38.1f;
@@ -156,6 +164,7 @@ namespace M6A2Adats
                         m2UA.PrimaryHeatRha = 38.1f;
                         m2UA.PrimarySabotRha = 38.1f;
                     }
+
                     if (m2UA.Name == "gunsight doghouse")
                     {
                         m2UA.PrimaryHeatRha = 25.4f;
@@ -167,6 +176,7 @@ namespace M6A2Adats
                         m2UA.PrimaryHeatRha = 12.7f;
                         m2UA.PrimarySabotRha = 12.7f;
                     }
+
                     if (m2UA.Name == "commander's hatch")
                     {
                         m2UA.PrimaryHeatRha = 50.8f;
@@ -178,6 +188,7 @@ namespace M6A2Adats
                         m2UA.PrimaryHeatRha = 50.8f;
                         m2UA.PrimarySabotRha = 50.8f;
                     }
+
                     if (m2UA.Name == "loading hatch")
                     {
                         m2UA.PrimaryHeatRha = 25.4f;
@@ -189,46 +200,52 @@ namespace M6A2Adats
                         m2UA.PrimaryHeatRha = 12.7f;
                         m2UA.PrimarySabotRha = 12.7f;
                     }
+
                     if (m2UA.Name == "swim vane")
                     {
                         m2UA.PrimaryHeatRha = 12.7f;
                         m2UA.PrimarySabotRha = 12.7f;
+                    }*/
+
+                    if (compositeHull.Value)
+                    {
+                        if (m2UA.Name == "hull front")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "hull side")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "hull side reinforcement")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "hull floor")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "hull rear")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "hull roof")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
                     }
 
-                    if (m2UA.Name == "hull front")
-                    {
-                        m2UA.PrimaryHeatRha = 90f;
-                        m2UA.PrimarySabotRha = 90f;
-                    }
-                    if (m2UA.Name == "hull side")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-
-                    if (m2UA.Name == "hull side reinforcement")
-                    {
-                        m2UA.PrimaryHeatRha = 38.1f;
-                        m2UA.PrimarySabotRha = 38.1f;
-                    }
-                    if (m2UA.Name == "hull floor")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-
-                    if (m2UA.Name == "hull rear")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-                    if (m2UA.Name == "hull roof")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-
-                    if (m2UA.Name == "gearbox cover")
+                    /*if (m2UA.Name == "gearbox cover")
                     {
                         m2UA.PrimaryHeatRha = 50.8f;
                         m2UA.PrimarySabotRha = 50.8f;
@@ -271,9 +288,9 @@ namespace M6A2Adats
                     {
                         m2UA.PrimaryHeatRha = 12.7f;
                         m2UA.PrimarySabotRha = 12.7f;
-                    }
+                    }*/
                 }
-            }*/
+            }
 
 
             foreach (GameObject vic_go in vic_gos)
@@ -286,8 +303,9 @@ namespace M6A2Adats
 
                 vic._friendlyName = "M6A2 ADATS";
 
-
                 vic.gameObject.AddComponent<Util.AlreadyConvertedADATS>();
+
+                //vic_go.AddComponent<ProxySwitchADATS>();
 
                 WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                 WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
@@ -303,6 +321,7 @@ namespace M6A2Adats
                 mainGun.FCS.MaxLaserRange = 6000;
 
 
+                mainGunInfo.Name = "25mm Gun GAU-12/U Equalizer";
                 mainGun.SetCycleTime(0.0166f); //3600 RPM
                 mainGun.BaseDeviationAngle = 0.045f;
                 mainGun.Impulse = 2000;
@@ -573,12 +592,13 @@ namespace M6A2Adats
                 ammo_ADATS.Tandem = true;
                 ammo_ADATS.SpallMultiplier = 1.5f;
                 ammo_ADATS.TurnSpeed = 2.5f;
-                ammo_ADATS.DetonateSpallCount = 100;
+                ammo_ADATS.DetonateSpallCount = 300;
                 ammo_ADATS.MaxSpallRha = 24;
-                ammo_ADATS.MinSpallRha = 12;
+                ammo_ADATS.MinSpallRha = 3;
                 ammo_ADATS.MaximumRange = 10000;
                 ammo_ADATS.ImpactFuseTime = 20; //max flight time is 20 secs
                 if (adatsTandem.Value) ammo_ADATS.ArmorOptimizations = era_optimizations_adats.ToArray<AmmoType.ArmorOptimization>();
+                //ProxyFuzeADATS.AddFuzeADATS(ammo_ADATS);
 
                 ammo_codex_ADATS = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_ADATS.AmmoType = ammo_ADATS;
