@@ -62,6 +62,8 @@ namespace M6A2Adats
         public override void OnInitializeMelon()
         {
             cfg = MelonPreferences.CreateCategory("ADATSConfig");
+            useGau = cfg.CreateEntry<bool>("GAU12", true);
+            useGau.Description = "Replaces M242 (500 RPM) with GAU-12 (3600 RPM)";
             adatsTandem = cfg.CreateEntry<bool>("ADATSTandem", false);
             adatsTandem.Description = "Better ERA defeat for ADATS";
             superOptics = cfg.CreateEntry<bool>("SuperOptics", false);
@@ -290,10 +292,9 @@ namespace M6A2Adats
                         m2UA.PrimarySabotRha = 12.7f;
                     }*/
                 }
-                
-                MelonLogger.Msg("Composite armor loaded");
             }
 
+            MelonLogger.Msg("Composite armor loaded");
 
             foreach (GameObject vic_go in vic_gos)
             {
@@ -323,14 +324,14 @@ namespace M6A2Adats
                 mainGun.FCS.MaxLaserRange = 6000;
 
 
-                if (useGau.Value) mainGunInfo.Name = "25mm Gun GAU-12/U Equalizer";
-                float gunRPM = useGau.Value ? 0.0166f : 0.1f;
-                mainGun.SetCycleTime(gunRPM); //3600 vs 600 RPM
+                if (useGau.Value) mainGunInfo.Name = "25mm Cannon GAU-12/U Equalizer";
+                float gunRPM = useGau.Value ? 0.0166f : 0.12f;
+                mainGun.SetCycleTime(gunRPM); //3600 vs 500 RPM
                 mainGun.BaseDeviationAngle = 0.045f;
                 mainGun.Impulse = 2000;
                 mainGun.RecoilBlurMultiplier = 0.5f;
 
-                mainGun.Feed._totalCycleTime = useGau.Value ? 0.0166f : 0.1f;//3600 vs 600 RPM
+                mainGun.Feed._totalCycleTime = useGau.Value ? 0.0166f : 0.12f;//3600 vs 500 RPM
 
                 towGunInfo.Name = "ADATS Launcher";
                 towGun.TriggerHoldTime = 0.5f;
@@ -378,20 +379,6 @@ namespace M6A2Adats
                 // update ballistics computer
                 MethodInfo registerAllBallistics = typeof(LoadoutManager).GetMethod("RegisterAllBallistics", BindingFlags.Instance | BindingFlags.NonPublic);
                 registerAllBallistics.Invoke(loadoutManager, new object[] { });
-
-
-                /*FireControlSystem FCS = mainGun.FCS;
-                UsableOptic optic = null;
-                if (FCS.MainOptic.slot.VisionType == NightVisionType.Thermal)
-                {
-                    optic = FCS.MainOptic;
-                }
-                else if (FCS.MainOptic.slot.LinkedNightSight != null && FCS.MainOptic.slot.LinkedNightSight.VisionType == NightVisionType.Thermal)
-                {
-                    optic = FCS.MainOptic.slot.LinkedNightSight.PairedOptic;
-                }
-
-                optic.slot.BaseBlur = 0;*/
 
                 // Better Thermals
                 var gpsOptic = vic_go.transform.Find("M2BRADLEY_rig/HULL/Turret/GPS Optic/").gameObject.transform;
@@ -527,7 +514,6 @@ namespace M6A2Adats
             yield break;
         }
 
-
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             if (sceneName == "MainMenu2_Scene" || sceneName == "LOADER_MENU" || sceneName == "MainMenu2-1_Scene" || sceneName == "LOADER_INITIAL" || sceneName == "t64_menu") return;
@@ -658,7 +644,6 @@ namespace M6A2Adats
                 clip_codex_APEX.name = "clip_APEX";
                 clip_codex_APEX.ClipType = clip_APEX;
             }
-
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Lowest);
         }
     }
