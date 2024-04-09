@@ -57,7 +57,7 @@ namespace M6A2Adats
 
 
         public static MelonPreferences_Category cfg;
-        static MelonPreferences_Entry<bool> adatsTandem, superOptics, betterDynamics, betterAI, compositeTurret, compositeHull;
+        static MelonPreferences_Entry<bool> adatsTandem, superOptics, betterDynamics, betterAI, compositeTurret, compositeHull, useGau;
 
         public override void OnInitializeMelon()
         {
@@ -290,6 +290,8 @@ namespace M6A2Adats
                         m2UA.PrimarySabotRha = 12.7f;
                     }*/
                 }
+                
+                MelonLogger.Msg("Composite armor loaded");
             }
 
 
@@ -321,13 +323,14 @@ namespace M6A2Adats
                 mainGun.FCS.MaxLaserRange = 6000;
 
 
-                mainGunInfo.Name = "25mm Gun GAU-12/U Equalizer";
-                mainGun.SetCycleTime(0.0166f); //3600 RPM
+                if (useGau.Value) mainGunInfo.Name = "25mm Gun GAU-12/U Equalizer";
+                float gunRPM = useGau.Value ? 0.0166f : 0.1f;
+                mainGun.SetCycleTime(gunRPM); //3600 vs 600 RPM
                 mainGun.BaseDeviationAngle = 0.045f;
                 mainGun.Impulse = 2000;
                 mainGun.RecoilBlurMultiplier = 0.5f;
 
-                mainGun.Feed._totalCycleTime = 0.0166f;//3600
+                mainGun.Feed._totalCycleTime = useGau.Value ? 0.0166f : 0.1f;//3600 vs 600 RPM
 
                 towGunInfo.Name = "ADATS Launcher";
                 towGun.TriggerHoldTime = 0.5f;
@@ -410,6 +413,8 @@ namespace M6A2Adats
                     flirPlus.BaseBlur = 0;
                     flirPlus.VibrationBlurScale = 0;
                     GameObject.Destroy(flirOptic.transform.Find("Canvas Scanlines").gameObject);
+
+                    MelonLogger.Msg("Super Optics Loaded");
                 }
 
                 //Vehicle dynamics under testing
@@ -485,6 +490,11 @@ namespace M6A2Adats
                         m6a2Vc.wheels[i].wheelController.sFriction.forceCoefficient = 0.85f;//0.8
                         m6a2Vc.wheels[i].wheelController.sFriction.slipCoefficient = 1f;//1 
                     }
+
+                    vic.AimablePlatforms[0].SpeedPowered = 80;//60
+                    vic.AimablePlatforms[0].SpeedUnpowered = 20;//5
+
+                    MelonLogger.Msg("Better vehicle dynamics loaded");
                 }
 
 
@@ -510,6 +520,8 @@ namespace M6A2Adats
                     m6a2Ai.AccuracyModifiers.Angle.MaxRadius = 5f;
                     m6a2Ai.AccuracyModifiers.Angle.MinRadius = 2f;
                     m6a2Ai.AccuracyModifiers.Angle.IncreaseAccuracyPerShot = false;
+
+                    MelonLogger.Msg("Better AI loaded");
                 }
             }
             yield break;
@@ -561,8 +573,8 @@ namespace M6A2Adats
                 ammo_M919.RhaPenetration = 102f;
                 ammo_M919.MuzzleVelocity = 1390f;
                 ammo_M919.Mass = 0.134f;
-                /*ammo_M919.SpallMultiplier = 1.5f;
                 ammo_M919.CertainRicochetAngle = 5;
+                /*ammo_M919.SpallMultiplier = 1.5f;
                 ammo_M919.MaxSpallRha = 16;
                 ammo_M919.MinSpallRha = 4;*/
 
@@ -597,6 +609,7 @@ namespace M6A2Adats
                 ammo_ADATS.MinSpallRha = 3;
                 ammo_ADATS.MaximumRange = 10000;
                 ammo_ADATS.ImpactFuseTime = 20; //max flight time is 20 secs
+                ammo_ADATS.CertainRicochetAngle = 5;
                 if (adatsTandem.Value) ammo_ADATS.ArmorOptimizations = era_optimizations_adats.ToArray<AmmoType.ArmorOptimization>();
                 //ProxyFuzeADATS.AddFuzeADATS(ammo_ADATS);
 
@@ -629,6 +642,7 @@ namespace M6A2Adats
                 ammo_APEX.DetonateSpallCount = 30;
                 ammo_APEX.MaxSpallRha = 16f;
                 ammo_APEX.MinSpallRha = 2f;
+                ammo_APEX.CertainRicochetAngle = 5;
 
                 ammo_codex_APEX = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_APEX.AmmoType = ammo_APEX;
