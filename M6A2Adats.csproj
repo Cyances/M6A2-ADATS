@@ -106,11 +106,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AirburstFuzeMPAB.cs" />
     <Compile Include="M6A2Adats.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ProxyFuzeADATS.cs" />
     <Compile Include="Util.cs" />
-	<Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

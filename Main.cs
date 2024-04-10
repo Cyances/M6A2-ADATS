@@ -13,7 +13,7 @@ using MelonLoader;
 using NWH.VehiclePhysics;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(AdatsMod), "Z M6A2", "1.1.0", "Cyance and Schweiz")]
+[assembly: MelonInfo(typeof(AdatsMod), "Z M6A2", "1.2.0", "Cyance and Schweiz")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M6A2Adats
