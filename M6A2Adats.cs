@@ -21,21 +21,14 @@ using GHPC.State;
 using GHPC.Utility;
 using System.Collections;
 using GHPC.AI;
-
-[assembly: MelonInfo(typeof(M6A2_Adats), "Z M6A2", "1.1.0", "Cyance and Schweiz")]
-[assembly: MelonGame("Radian Simulations LLC", "GHPC")]
+using BehaviorDesigner.Runtime.Tasks.Unity.UnityGameObject;
+using HarmonyLib;
 
 
 namespace M6A2Adats
 {
-    public class M6A2_Adats : MelonMod
+    public static class M6A2_Adats
     {
-
-        public static GameObject[] vic_gos;
-        public static GameObject gameManager;
-        public static CameraManager cameraManager;
-        public static PlayerInput playerManager;
-
         public static AmmoClipCodexScriptable clip_codex_M919;
         public static AmmoType.AmmoClip clip_M919;
         public static AmmoCodexScriptable ammo_codex_M919;
@@ -51,21 +44,30 @@ namespace M6A2Adats
         public static AmmoCodexScriptable ammo_codex_APEX;
         public static AmmoType ammo_APEX;
 
+        public static AmmoClipCodexScriptable clip_codex_M920;
+        public static AmmoType.AmmoClip clip_M920;
+        public static AmmoCodexScriptable ammo_codex_M920;
+        public static AmmoType ammo_M920;
+
         public static AmmoType ammo_m791;
         public static AmmoType ammo_m792;
         public static AmmoType ammo_I_TOW;
 
+        static MelonPreferences_Entry<bool> adatsTandem, mpab, superOptics, betterDynamics, betterAI, compositeTurret, compositeHull, useGau, rotateAzimuth;
+        public static MelonPreferences_Entry<float> proxyDistance;
 
-        public static MelonPreferences_Category cfg;
-        static MelonPreferences_Entry<bool> adatsTandem, superOptics, betterDynamics, betterAI, compositeTurret, compositeHull, useGau;
-
-        public override void OnInitializeMelon()
+        public static void Config(MelonPreferences_Category cfg)
         {
-            cfg = MelonPreferences.CreateCategory("ADATSConfig");
             useGau = cfg.CreateEntry<bool>("GAU12", true);
             useGau.Description = "Replaces M242 (500 RPM) with GAU-12 (3600 RPM)";
+            mpab = cfg.CreateEntry<bool>("MPAB", false);
+            mpab.Description = "Replaces APEX with MPAB (TD airburst)";
             adatsTandem = cfg.CreateEntry<bool>("ADATSTandem", false);
             adatsTandem.Description = "Better ERA defeat for ADATS";
+            proxyDistance = cfg.CreateEntry<float>("ProxyDistance", 3);
+            proxyDistance.Description = "Trigger distance of ADATS proximity fuze (in meters).";
+            rotateAzimuth = cfg.CreateEntry<bool>("RotateAzimuth", false);
+            rotateAzimuth.Description = "Horizontal reticle stabilization when leading";
             superOptics = cfg.CreateEntry<bool>("SuperOptics", false);
             superOptics.Description = "More zoom levels/clearer image for main and thermal sights";
             betterDynamics = cfg.CreateEntry<bool>("BetterDynamics", false);
@@ -79,11 +81,6 @@ namespace M6A2Adats
 
         public static IEnumerator Convert(GameState _)
         {
-            vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
-            gameManager = GameObject.Find("_APP_GHPC_");
-            playerManager = gameManager.GetComponent<PlayerInput>();
-
-
             ////UniformArmor pieces
             ///Extra armor under testing
             foreach (GameObject armour in GameObject.FindGameObjectsWithTag("Penetrable"))
@@ -296,7 +293,7 @@ namespace M6A2Adats
 
             MelonLogger.Msg("Composite armor loaded");
 
-            foreach (GameObject vic_go in vic_gos)
+            foreach (GameObject vic_go in AdatsMod.vic_gos)
             {
                 Vehicle vic = vic_go.GetComponent<Vehicle>();
 
@@ -304,11 +301,11 @@ namespace M6A2Adats
                 if (vic.FriendlyName != "M2 Bradley") continue;
                 if (vic.GetComponent<Util.AlreadyConvertedADATS>() != null) continue;
 
-                vic._friendlyName = "M6A2 ADATS";
+                vic._friendlyName = useGau.Value ? "M6A2 ADATS" : "M6A1 ADATS";
 
                 vic.gameObject.AddComponent<Util.AlreadyConvertedADATS>();
 
-                //vic_go.AddComponent<ProxySwitchADATS>();
+                vic_go.AddComponent<ProxySwitchADATS>();
 
                 WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                 WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
@@ -322,6 +319,15 @@ namespace M6A2Adats
                 FieldInfo fixParallaxField = typeof(FireControlSystem).GetField("_fixParallaxForVectorMode", BindingFlags.Instance | BindingFlags.NonPublic);
                 fixParallaxField.SetValue(mainGun.FCS, true);
                 mainGun.FCS.MaxLaserRange = 6000;
+
+
+                //USSR Vehicles/T80B/T80B_rig/HULL/TURRET/gun/---MAIN GUN SCRIPTS---/2A46-2/1G42 gunner's sight/
+                //US Vehicles/M2 Bradley/FCS and sights
+                mainGun.FCS.SuperleadWeapon = true;
+                mainGun.FCS.SuperelevateWeapon = true;
+                mainGun.FCS.RegisteredRangeLimits = new Vector2(200, 4000);
+                mainGun.FCS.RecordTraverseRateBuffer = true;
+                mainGun.FCS.TraverseBufferSeconds = 0.5f;
 
 
                 if (useGau.Value) mainGunInfo.Name = "25mm Cannon GAU-12/U Equalizer";
@@ -353,13 +359,13 @@ namespace M6A2Adats
 
                 LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
 
-                loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { clip_codex_M919, clip_codex_APEX };
+                loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { clip_codex_M919, mpab.Value ? clip_codex_M920 : clip_codex_APEX };
 
                 for (int i = 0; i <= 1; i++)
                 {
                     GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
-                    loadoutManager.RackLoadouts[i].OverrideInitialClips = new AmmoClipCodexScriptable[] { clip_codex_M919, clip_codex_APEX };
-                    rack.ClipTypes = new AmmoType.AmmoClip[] { clip_M919, clip_APEX };
+                    loadoutManager.RackLoadouts[i].OverrideInitialClips = new AmmoClipCodexScriptable[] { clip_codex_M919, mpab.Value ? clip_codex_M920 : clip_codex_APEX };
+                    rack.ClipTypes = new AmmoType.AmmoClip[] { clip_M919, mpab.Value ? clip_M920 : clip_APEX };
                     Util.EmptyRack(rack);
                 }
 
@@ -384,8 +390,19 @@ namespace M6A2Adats
                 var gpsOptic = vic_go.transform.Find("M2BRADLEY_rig/HULL/Turret/GPS Optic/").gameObject.transform;
                 var flirOptic = vic_go.transform.Find("M2BRADLEY_rig/HULL/Turret/FLIR/").gameObject.transform;
 
+                UsableOptic horizontalGps = gpsOptic.GetComponent<UsableOptic>();
+                UsableOptic horizontalFlir = flirOptic.GetComponent<UsableOptic>();
+
                 CameraSlot daysightPlus = gpsOptic.GetComponent<CameraSlot>();
                 CameraSlot flirPlus = flirOptic.GetComponent<CameraSlot>();
+
+
+
+                if (rotateAzimuth.Value)
+                {
+                    horizontalGps.RotateAzimuth = true;
+                    horizontalFlir.RotateAzimuth = true;
+                }
 
                 if (superOptics.Value)
                 {
@@ -393,7 +410,6 @@ namespace M6A2Adats
                     daysightPlus.OtherFovs = new float[] { 8f, 5.5f, 4f, 2.5f, 1.25f, 0.5f };//2.5
                     daysightPlus.BaseBlur = 0;
                     daysightPlus.VibrationBlurScale = 0;
-
 
                     flirPlus.DefaultFov = 16.5f;//8
                     flirPlus.OtherFovs = new float[] { 8f, 5.5f, 4f, 2.5f, 1.25f, 0.5f };//2.5
@@ -511,13 +527,12 @@ namespace M6A2Adats
                     MelonLogger.Msg("Better AI loaded");
                 }
             }
+
             yield break;
         }
 
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+        public static void Init()
         {
-            if (sceneName == "MainMenu2_Scene" || sceneName == "LOADER_MENU" || sceneName == "MainMenu2-1_Scene" || sceneName == "LOADER_INITIAL" || sceneName == "t64_menu") return;
-
             if (ammo_M919 == null)
             {
                 foreach (AmmoCodexScriptable s in Resources.FindObjectsOfTypeAll(typeof(AmmoCodexScriptable)))
@@ -550,7 +565,7 @@ namespace M6A2Adats
                     if (era_optimizations_adats.Count == era_names.Length) break;
                 }
 
-                // M919  APFSDS-T
+                // M919 APFSDS-T
 
                 ammo_M919 = new AmmoType();
                 Util.ShallowCopy(ammo_M919, ammo_m791);
@@ -597,7 +612,7 @@ namespace M6A2Adats
                 ammo_ADATS.ImpactFuseTime = 20; //max flight time is 20 secs
                 ammo_ADATS.CertainRicochetAngle = 5;
                 if (adatsTandem.Value) ammo_ADATS.ArmorOptimizations = era_optimizations_adats.ToArray<AmmoType.ArmorOptimization>();
-                //ProxyFuzeADATS.AddFuzeADATS(ammo_ADATS);
+                ProxyFuzeADATS.AddFuzeADATS(ammo_ADATS);
 
                 ammo_codex_ADATS = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_ADATS.AmmoType = ammo_ADATS;
@@ -610,11 +625,10 @@ namespace M6A2Adats
                 clip_ADATS.MinimalPattern[0] = ammo_codex_ADATS;
 
                 clip_codex_ADATS = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_ADATS.name = "clip_TOW_2A";
+                clip_codex_ADATS.name = "clip_ADAT";
                 clip_codex_ADATS.ClipType = clip_ADATS;
 
                 // APEX APHE-T
-
                 ammo_APEX = new AmmoType();
                 Util.ShallowCopy(ammo_APEX, ammo_m792);
                 ammo_APEX.Name = "APEX APHE-T";
@@ -643,8 +657,64 @@ namespace M6A2Adats
                 clip_codex_APEX = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
                 clip_codex_APEX.name = "clip_APEX";
                 clip_codex_APEX.ClipType = clip_APEX;
+
+                // M920 MPAB-T
+                ammo_M920 = new AmmoType();
+                Util.ShallowCopy(ammo_M920, ammo_m792);
+                ammo_M920.Name = "M920 MPAB-T";
+                ammo_M920.Coeff = 0.1f;
+                ammo_M920.Caliber = 25;
+                ammo_M920.RhaPenetration = 15f;
+                ammo_M920.MuzzleVelocity = 1270f;
+                ammo_M920.Mass = 0.222f;
+                ammo_M920.TntEquivalentKg = 0.050f;
+                ammo_M920.SpallMultiplier = 1.25f;
+                ammo_M920.DetonateSpallCount = 60;
+                ammo_M920.MaxSpallRha = 26f;
+                ammo_M920.MinSpallRha = 2f;
+                ammo_M920.CertainRicochetAngle = 5;
+
+                ammo_codex_M920 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
+                ammo_codex_M920.AmmoType = ammo_M920;
+                ammo_codex_M920.name = "ammo_M920";
+
+                clip_M920 = new AmmoType.AmmoClip();
+                clip_M920.Capacity = 1200;
+                clip_M920.Name = "M920 MPAB-T";
+                clip_M920.MinimalPattern = new AmmoCodexScriptable[1];
+                clip_M920.MinimalPattern[0] = ammo_codex_M920;
+
+                clip_codex_M920 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
+                clip_codex_M920.name = "clip_M920";
+                clip_codex_M920.ClipType = clip_M920;
             }
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Lowest);
+        }
+
+        [HarmonyPatch(typeof(GHPC.Weapons.LiveRound), "Start")]
+        public static class Airburst
+        {
+            private static void Postfix(GHPC.Weapons.LiveRound __instance)
+            {
+                {
+                    if (__instance.Info.Name != "M920 MPAB-T") return;
+
+                    FieldInfo rangedFuseTimeField = typeof(GHPC.Weapons.LiveRound).GetField("_rangedFuseCountdown", BindingFlags.Instance | BindingFlags.NonPublic);
+                    FieldInfo rangedFuseTimeActiveField = typeof(GHPC.Weapons.LiveRound).GetField("_rangedFuseActive", BindingFlags.Instance | BindingFlags.NonPublic);
+                    FieldInfo ballisticsComputerField = typeof(FireControlSystem).GetField("_bc", BindingFlags.Instance | BindingFlags.NonPublic);
+
+                    FireControlSystem FCS = __instance.Shooter.WeaponsManager.Weapons[0].FCS;
+                    BallisticComputerRepository bc = ballisticsComputerField.GetValue(FCS) as BallisticComputerRepository;
+
+                    float range = FCS.CurrentRange;
+                    float fallOff = bc.GetFallOfShot(ammo_M920, range);
+                    float extra_distance = range > 2000 ? 19f + 3.5f : 17f;
+
+                    //funky math 
+                    rangedFuseTimeField.SetValue(__instance, bc.GetFlightTime(ammo_M920, range + range / ammo_M920.MuzzleVelocity * 2 + (range + fallOff) / 2000f + extra_distance));
+                    rangedFuseTimeActiveField.SetValue(__instance, true);
+                }
+            }
         }
     }
 }

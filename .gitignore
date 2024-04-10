@@ -38,3 +38,7 @@ bin/Debug/Newtonsoft.Json.dll
 /.vs
 /.vs
 .vs/M6A2Adats/v17/.suo
+/.vs
+obj/Debug/M6A2Adats.csproj.CoreCompileInputs.cache
+.vs/M6A2Adats/v17/.suo
+obj/Debug/M6A2Adats.csproj.CoreCompileInputs.cache

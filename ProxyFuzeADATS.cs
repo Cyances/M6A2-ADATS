@@ -24,7 +24,7 @@ namespace M6A2Adats
 
         void Awake()
         {
-            weapon = GetComponent<WeaponsManager>().Weapons[0].Weapon;
+            weapon = GetComponent<WeaponsManager>().Weapons[1].Weapon;
             player_manager = GameObject.Find("_APP_GHPC_").GetComponent<PlayerInput>();
         }
 
@@ -93,7 +93,7 @@ namespace M6A2Adats
                     Detonate();
 
             RaycastHit hit3;
-                if (Physics.SphereCast(pos, 3f, live_round.transform.forward, out hit3, 0.1f, 1 << 8))
+            if (Physics.SphereCast(pos, M6A2_Adats.proxyDistance.Value, live_round.transform.forward, out hit3, 0.1f, 1 << 8))
                 if (hit3.collider.CompareTag("Penetrable"))
                     Detonate();
 
