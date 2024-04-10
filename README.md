@@ -10,7 +10,7 @@
 		<li>Added M791 APDS-T</li>
 		<li>Added M920 MPAB-T which has a constant time-delay airburst fuze and improved fragmentation compared to APEX, but weaker direct impact effect</li>
 		<li>Added AP option between M791 and M919, and HE option between APEX and MPAB</li>
-		<li>Added customizable AP/HE loadout (max of 1500)</li>
+		<li>Added customizable AP/HE loadout (max of 1500). If total round count exceeds 1500, the mod will use the default 300/1200 mix</li>
 		<li>Added ADATS proximity fuze with customizable sensitivity </li>
 		<li>Added automatic lead calculation (same behavior as Abrams)</li>
 		<li>Added horizontal reticle stabilization when leading</li>
