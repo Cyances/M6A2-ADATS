@@ -15,7 +15,7 @@ This mod replaces the M2 Bradley with the M6 Linebacker but pretend it has the G
 		<li>M791 APDS-T: 1345 m/s velocity and 60 mm RHA penetration</li>
 		<li>M919 APFSDS-T: 1390 m/s velocity and 102 mm RHA penetration</li>
 		<li>APEX APHE-T: 1270 m/s velocity and 35 mm RHA penetration</li>
-		<li>M920 MPAB-T: 1270 m/s velocity, 15 mm RHA penetration and a constant time-delay airburst fuze </li>
+		<li>M920 MPAB-T (hypothetical): 1270 m/s velocity, 15 mm RHA penetration and a constant time-delay airburst fuze</li>
 		<li>MIM-146 ADATS: 510 m/s velocity, 1000 mm RHA penetration, proximity fuze toggle and 10 km max range. 4 ready to launch (imagine two tubes on each side of the turret) and 12 stowed</li>
 		<li>AP option between M791 and M919, and HE option between APEX and MPAB</li>
 		<li>Option for ADATS tandem warhead</li>
