@@ -57,8 +57,7 @@ This mod replaces the M2 Bradley with the M6 Linebacker but pretend it has the G
 		<li>Use GAU-12 (true by default)</li>
 		<li>Use M919 (false by default)</li>
 		<li>Use M920 MPAB (false by default)</li>
-		<li>AP round count (300 by default)</li>
-		<li>HE round count (1200 by default)</li>
+		<li>AP and HE round count (300/1200 by default). If total round count exceeds 1500, the mod will use the default mix.</li>
 		<li>Enable ADATS tandem warhead (false by default)</li>
 		<li>ADATS proximity fuze sensitivity (3 by default)</li>
 		<li>Reticle horizontal stabilization when leading (false by default)</li>
