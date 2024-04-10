@@ -236,3 +236,4 @@ C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\ZM6A2A
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\ZM6A2Adats.pdb
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\obj\Debug\ZM6A2Adats.dll
 C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\obj\Debug\ZM6A2Adats.pdb
+C:\Users\Cyance\Documents\Desktop Shortcuts\SDK\GHPC\M6A2-ADATS\bin\Debug\FMODUnityResonance.dll

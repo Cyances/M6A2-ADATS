@@ -21,67 +21,79 @@ using GHPC.State;
 using GHPC.Utility;
 using System.Collections;
 using GHPC.AI;
-
-[assembly: MelonInfo(typeof(M6A2_Adats), "Z M6A2", "1.1.0", "Cyance and Schweiz")]
-[assembly: MelonGame("Radian Simulations LLC", "GHPC")]
+using HarmonyLib;
 
 
 namespace M6A2Adats
 {
-    public class M6A2_Adats : MelonMod
+    public static class M6A2_Adats
     {
+        public static AmmoClipCodexScriptable clip_codex_M919;
+        public static AmmoType.AmmoClip clip_M919;
+        public static AmmoCodexScriptable ammo_codex_M919;
+        public static AmmoType ammo_M919;
 
-        GameObject[] vic_gos;
-        GameObject gameManager;
-        CameraManager cameraManager;
-        PlayerInput playerManager;
+        public static AmmoClipCodexScriptable clip_codex_M791m6;
+        public static AmmoType.AmmoClip clip_M791m6;
+        public static AmmoCodexScriptable ammo_codex_M791m6;
+        public static AmmoType ammo_M791m6;
 
-        AmmoClipCodexScriptable clip_codex_M919;
-        AmmoType.AmmoClip clip_M919;
-        AmmoCodexScriptable ammo_codex_M919;
-        AmmoType ammo_M919;
+        public static AmmoClipCodexScriptable clip_codex_ADATS;
+        public static AmmoType.AmmoClip clip_ADATS;
+        public static AmmoCodexScriptable ammo_codex_ADATS;
+        public static AmmoType ammo_ADATS;
 
-        AmmoClipCodexScriptable clip_codex_ADATS;
-        AmmoType.AmmoClip clip_ADATS;
-        AmmoCodexScriptable ammo_codex_ADATS;
-        AmmoType ammo_ADATS;
+        public static AmmoClipCodexScriptable clip_codex_APEX;
+        public static AmmoType.AmmoClip clip_APEX;
+        public static AmmoCodexScriptable ammo_codex_APEX;
+        public static AmmoType ammo_APEX;
 
-        AmmoClipCodexScriptable clip_codex_APEX;
-        AmmoType.AmmoClip clip_APEX;
-        AmmoCodexScriptable ammo_codex_APEX;
-        AmmoType ammo_APEX;
+        public static AmmoClipCodexScriptable clip_codex_M920;
+        public static AmmoType.AmmoClip clip_M920;
+        public static AmmoCodexScriptable ammo_codex_M920;
+        public static AmmoType ammo_M920;
 
-        AmmoType ammo_m791;
-        AmmoType ammo_m792;
-        AmmoType ammo_I_TOW;
+        public static AmmoType ammo_m791;
+        public static AmmoType ammo_m792;
+        public static AmmoType ammo_I_TOW;
 
+        static MelonPreferences_Entry<bool> useGau, useM919, useM920, adatsTandem, superOptics, betterDynamics, betterAI, compositeTurret, compositeHull, rotateAzimuth;
+        static MelonPreferences_Entry<int> apCount, heCount;
+        public static MelonPreferences_Entry<float> proxyDistance;
 
-        MelonPreferences_Category cfg;
-        static MelonPreferences_Entry<bool> adatsTandem, superOptics, betterDynamics, betterAI;
-
-        public override void OnInitializeMelon()
+        public static void Config(MelonPreferences_Category cfg)
         {
-            cfg = MelonPreferences.CreateCategory("ADATSConfig");
+            useGau = cfg.CreateEntry<bool>("GAU12", true);
+            useGau.Description = "Replaces M242 (500 RPM) with GAU-12 (3600 RPM)";
+            useM919 = cfg.CreateEntry<bool>("M919", false);
+            useM919.Description = "Replaces M792 with M919 APFSDS";
+            useM920 = cfg.CreateEntry<bool>("MPAB", false);
+            useM920.Description = "Replaces APEX with MPAB (TD airburst)";
+            apCount = cfg.CreateEntry<int>("APCount", 300);
+            apCount.Description = "Round type count, give at least 1 per type (max of 1500)";
+            heCount = cfg.CreateEntry<int>("HECount", 1200);
             adatsTandem = cfg.CreateEntry<bool>("ADATSTandem", false);
             adatsTandem.Description = "Better ERA defeat for ADATS";
+            proxyDistance = cfg.CreateEntry<float>("ProxyDistance", 3);
+            proxyDistance.Description = "Trigger distance of ADATS proximity fuze (in meters).";
+            rotateAzimuth = cfg.CreateEntry<bool>("RotateAzimuth", false);
+            rotateAzimuth.Description = "Horizontal reticle stabilization when leading";
             superOptics = cfg.CreateEntry<bool>("SuperOptics", false);
             superOptics.Description = "More zoom levels/clearer image for main and thermal sights";
             betterDynamics = cfg.CreateEntry<bool>("BetterDynamics", false);
             betterDynamics.Description = "Better engine/transmission/suspension/tracks";
             betterAI = cfg.CreateEntry<bool>("BetterAI", false);
             betterAI.Description = "Better AI spotting and gunnery";
+            compositeHull = cfg.CreateEntry<bool>("CompositeHull", false);
+            compositeHull.Description = "50% better protection with no weight penalty";
+            compositeTurret = cfg.CreateEntry<bool>("CompositeTurret", false);
         }
 
-        public IEnumerator Convert(GameState _)
+        public static IEnumerator Convert(GameState _)
         {
-            vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
-            gameManager = GameObject.Find("_APP_GHPC_");
-            playerManager = gameManager.GetComponent<PlayerInput>();
-
-
             ////UniformArmor pieces
             ///Extra armor under testing
-            /*foreach (GameObject armour in GameObject.FindGameObjectsWithTag("Penetrable"))
+            foreach (GameObject armour in GameObject.FindGameObjectsWithTag("Penetrable"))
             {
                 if (armour == null) continue;
 
@@ -90,61 +102,66 @@ namespace M6A2Adats
                 if (m2UA.Unit == null) continue;
                 if (m2UA.Unit.FriendlyName == "M2 Bradley")
                 {
-                    if (m2UA.Name == "turret face")
+                    if (compositeTurret.Value)
                     {
-                        m2UA.PrimaryHeatRha = 80f;
-                        m2UA.PrimarySabotRha = 80f;
+                        if (m2UA.Name == "turret face")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "turret side")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "turret rear")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "turret roof")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "turret bottom")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "turret inner frame")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "turret ring collar")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "gun mantlet")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "trunnion shield")
+                        {
+                            m2UA.PrimaryHeatRha = 12.7f;
+                            m2UA.PrimarySabotRha = 12.7f;
+                        }
                     }
 
-                    if (m2UA.Name == "turret side")
-                    {
-                        m2UA.PrimaryHeatRha = 80f;
-                        m2UA.PrimarySabotRha = 80f;
-                    }
-                    if (m2UA.Name == "turret rear")
-                    {
-                        m2UA.PrimaryHeatRha = 80f;
-                        m2UA.PrimarySabotRha = 80f;
-                    }
-
-                    if (m2UA.Name == "turret roof")
-                    {
-                        m2UA.PrimaryHeatRha = 76.2f;
-                        m2UA.PrimarySabotRha = 76.2f;
-                    }
-                    if (m2UA.Name == "turret bottom")
-                    {
-                        m2UA.PrimaryHeatRha = 76.2f;
-                        m2UA.PrimarySabotRha = 76.2f;
-                    }
-
-                    if (m2UA.Name == "turret inner frame")
+                    /*if (m2UA.Name == "machine gun sleeve")
                     {
                         m2UA.PrimaryHeatRha = 38.1f;
                         m2UA.PrimarySabotRha = 38.1f;
                     }
-                    if (m2UA.Name == "turret ring collar")
-                    {
-                        m2UA.PrimaryHeatRha = 38.1f;
-                        m2UA.PrimarySabotRha = 38.1f;
-                    }
 
-                    if (m2UA.Name == "gun mantlet")
-                    {
-                        m2UA.PrimaryHeatRha = 80;
-                        m2UA.PrimarySabotRha = 80f;
-                    }
-                    if (m2UA.Name == "trunnion shield")
-                    {
-                        m2UA.PrimaryHeatRha = 12.7f;
-                        m2UA.PrimarySabotRha = 12.7f;
-                    }
-
-                    if (m2UA.Name == "machine gun sleeve")
-                    {
-                        m2UA.PrimaryHeatRha = 38.1f;
-                        m2UA.PrimarySabotRha = 38.1f;
-                    }
                     if (m2UA.Name == "cannon sleeve")
                     {
                         m2UA.PrimaryHeatRha = 38.1f;
@@ -156,6 +173,7 @@ namespace M6A2Adats
                         m2UA.PrimaryHeatRha = 38.1f;
                         m2UA.PrimarySabotRha = 38.1f;
                     }
+
                     if (m2UA.Name == "gunsight doghouse")
                     {
                         m2UA.PrimaryHeatRha = 25.4f;
@@ -167,6 +185,7 @@ namespace M6A2Adats
                         m2UA.PrimaryHeatRha = 12.7f;
                         m2UA.PrimarySabotRha = 12.7f;
                     }
+
                     if (m2UA.Name == "commander's hatch")
                     {
                         m2UA.PrimaryHeatRha = 50.8f;
@@ -178,57 +197,64 @@ namespace M6A2Adats
                         m2UA.PrimaryHeatRha = 50.8f;
                         m2UA.PrimarySabotRha = 50.8f;
                     }
+
                     if (m2UA.Name == "loading hatch")
                     {
                         m2UA.PrimaryHeatRha = 25.4f;
                         m2UA.PrimarySabotRha = 25.4f;
                     }
 
-                    if (m2UA.Name == "anti-mine plate")
-                    {
-                        m2UA.PrimaryHeatRha = 12.7f;
-                        m2UA.PrimarySabotRha = 12.7f;
-                    }
                     if (m2UA.Name == "swim vane")
                     {
                         m2UA.PrimaryHeatRha = 12.7f;
                         m2UA.PrimarySabotRha = 12.7f;
+                    }*/
+
+                    if (compositeHull.Value)
+                    {
+                        if (m2UA.Name == "anti-mine plate")
+                        {
+                            m2UA.PrimaryHeatRha = 12.7f;
+                            m2UA.PrimarySabotRha = 12.7f;
+                        }
+
+                        if (m2UA.Name == "hull front")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+                        if (m2UA.Name == "hull side")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "hull side reinforcement")
+                        {
+                            m2UA.PrimaryHeatRha = 12.7f;
+                            m2UA.PrimarySabotRha = 12.7f;
+                        }
+
+                        if (m2UA.Name == "hull floor")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "hull rear")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
+
+                        if (m2UA.Name == "hull roof")
+                        {
+                            m2UA.PrimaryHeatRha = 38.1f;
+                            m2UA.PrimarySabotRha = 38.1f;
+                        }
                     }
 
-                    if (m2UA.Name == "hull front")
-                    {
-                        m2UA.PrimaryHeatRha = 90f;
-                        m2UA.PrimarySabotRha = 90f;
-                    }
-                    if (m2UA.Name == "hull side")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-
-                    if (m2UA.Name == "hull side reinforcement")
-                    {
-                        m2UA.PrimaryHeatRha = 38.1f;
-                        m2UA.PrimarySabotRha = 38.1f;
-                    }
-                    if (m2UA.Name == "hull floor")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-
-                    if (m2UA.Name == "hull rear")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-                    if (m2UA.Name == "hull roof")
-                    {
-                        m2UA.PrimaryHeatRha = 50.8f;
-                        m2UA.PrimarySabotRha = 50.8f;
-                    }
-
-                    if (m2UA.Name == "gearbox cover")
+                    /*if (m2UA.Name == "gearbox cover")
                     {
                         m2UA.PrimaryHeatRha = 50.8f;
                         m2UA.PrimarySabotRha = 50.8f;
@@ -271,12 +297,13 @@ namespace M6A2Adats
                     {
                         m2UA.PrimaryHeatRha = 12.7f;
                         m2UA.PrimarySabotRha = 12.7f;
-                    }
+                    }*/
                 }
-            }*/
+            }
 
+            MelonLogger.Msg("Composite armor loaded");
 
-            foreach (GameObject vic_go in vic_gos)
+            foreach (GameObject vic_go in AdatsMod.vic_gos)
             {
                 Vehicle vic = vic_go.GetComponent<Vehicle>();
 
@@ -284,10 +311,11 @@ namespace M6A2Adats
                 if (vic.FriendlyName != "M2 Bradley") continue;
                 if (vic.GetComponent<Util.AlreadyConvertedADATS>() != null) continue;
 
-                vic._friendlyName = "M6A2 ADATS";
-
+                vic._friendlyName = useGau.Value ? "M6A2 ADATS" : "M6A1 ADATS";
 
                 vic.gameObject.AddComponent<Util.AlreadyConvertedADATS>();
+
+                vic_go.AddComponent<ProxySwitchADATS>();
 
                 WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                 WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
@@ -303,12 +331,23 @@ namespace M6A2Adats
                 mainGun.FCS.MaxLaserRange = 6000;
 
 
-                mainGun.SetCycleTime(0.0166f); //3600 RPM
+                //USSR Vehicles/T80B/T80B_rig/HULL/TURRET/gun/---MAIN GUN SCRIPTS---/2A46-2/1G42 gunner's sight/
+                //US Vehicles/M2 Bradley/FCS and sights
+                mainGun.FCS.SuperleadWeapon = true;
+                mainGun.FCS.SuperelevateWeapon = true;
+                mainGun.FCS.RegisteredRangeLimits = new Vector2(200, 4000);
+                mainGun.FCS.RecordTraverseRateBuffer = true;
+                mainGun.FCS.TraverseBufferSeconds = 0.5f;
+
+
+                if (useGau.Value) mainGunInfo.Name = "25mm Cannon GAU-12/U Equalizer";
+                float gunRPM = useGau.Value ? 0.0166f : 0.12f;
+                mainGun.SetCycleTime(gunRPM); //3600 vs 500 RPM
                 mainGun.BaseDeviationAngle = 0.045f;
                 mainGun.Impulse = 2000;
                 mainGun.RecoilBlurMultiplier = 0.5f;
 
-                mainGun.Feed._totalCycleTime = 0.0166f;//3600
+                mainGun.Feed._totalCycleTime = useGau.Value ? 0.0166f : 0.12f;//3600 vs 500 RPM
 
                 towGunInfo.Name = "ADATS Launcher";
                 towGun.TriggerHoldTime = 0.5f;
@@ -330,13 +369,13 @@ namespace M6A2Adats
 
                 LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
 
-                loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { clip_codex_M919, clip_codex_APEX };
+                loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { useM919.Value ? clip_codex_M919 : clip_codex_M791m6, useM920.Value ? clip_codex_M920 : clip_codex_APEX };
 
                 for (int i = 0; i <= 1; i++)
                 {
                     GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
-                    loadoutManager.RackLoadouts[i].OverrideInitialClips = new AmmoClipCodexScriptable[] { clip_codex_M919, clip_codex_APEX };
-                    rack.ClipTypes = new AmmoType.AmmoClip[] { clip_M919, clip_APEX };
+                    loadoutManager.RackLoadouts[i].OverrideInitialClips = new AmmoClipCodexScriptable[] { useM919.Value ? clip_codex_M919 : clip_codex_M791m6, useM920.Value ? clip_codex_M920 : clip_codex_APEX };
+                    rack.ClipTypes = new AmmoType.AmmoClip[] { useM919.Value ? clip_M919 : clip_M791m6, useM920.Value ? clip_M920 : clip_APEX };
                     Util.EmptyRack(rack);
                 }
 
@@ -357,26 +396,23 @@ namespace M6A2Adats
                 MethodInfo registerAllBallistics = typeof(LoadoutManager).GetMethod("RegisterAllBallistics", BindingFlags.Instance | BindingFlags.NonPublic);
                 registerAllBallistics.Invoke(loadoutManager, new object[] { });
 
-
-                /*FireControlSystem FCS = mainGun.FCS;
-                UsableOptic optic = null;
-                if (FCS.MainOptic.slot.VisionType == NightVisionType.Thermal)
-                {
-                    optic = FCS.MainOptic;
-                }
-                else if (FCS.MainOptic.slot.LinkedNightSight != null && FCS.MainOptic.slot.LinkedNightSight.VisionType == NightVisionType.Thermal)
-                {
-                    optic = FCS.MainOptic.slot.LinkedNightSight.PairedOptic;
-                }
-
-                optic.slot.BaseBlur = 0;*/
-
                 // Better Thermals
                 var gpsOptic = vic_go.transform.Find("M2BRADLEY_rig/HULL/Turret/GPS Optic/").gameObject.transform;
                 var flirOptic = vic_go.transform.Find("M2BRADLEY_rig/HULL/Turret/FLIR/").gameObject.transform;
 
+                UsableOptic horizontalGps = gpsOptic.GetComponent<UsableOptic>();
+                UsableOptic horizontalFlir = flirOptic.GetComponent<UsableOptic>();
+
                 CameraSlot daysightPlus = gpsOptic.GetComponent<CameraSlot>();
                 CameraSlot flirPlus = flirOptic.GetComponent<CameraSlot>();
+
+
+
+                if (rotateAzimuth.Value)
+                {
+                    horizontalGps.RotateAzimuth = true;
+                    horizontalFlir.RotateAzimuth = true;
+                }
 
                 if (superOptics.Value)
                 {
@@ -385,12 +421,13 @@ namespace M6A2Adats
                     daysightPlus.BaseBlur = 0;
                     daysightPlus.VibrationBlurScale = 0;
 
-
                     flirPlus.DefaultFov = 16.5f;//8
                     flirPlus.OtherFovs = new float[] { 8f, 5.5f, 4f, 2.5f, 1.25f, 0.5f };//2.5
                     flirPlus.BaseBlur = 0;
                     flirPlus.VibrationBlurScale = 0;
                     GameObject.Destroy(flirOptic.transform.Find("Canvas Scanlines").gameObject);
+
+                    MelonLogger.Msg("Super Optics Loaded");
                 }
 
                 //Vehicle dynamics under testing
@@ -466,6 +503,11 @@ namespace M6A2Adats
                         m6a2Vc.wheels[i].wheelController.sFriction.forceCoefficient = 0.85f;//0.8
                         m6a2Vc.wheels[i].wheelController.sFriction.slipCoefficient = 1f;//1 
                     }
+
+                    vic.AimablePlatforms[0].SpeedPowered = 80;//60
+                    vic.AimablePlatforms[0].SpeedUnpowered = 20;//5
+
+                    MelonLogger.Msg("Better vehicle dynamics loaded");
                 }
 
 
@@ -491,16 +533,36 @@ namespace M6A2Adats
                     m6a2Ai.AccuracyModifiers.Angle.MaxRadius = 5f;
                     m6a2Ai.AccuracyModifiers.Angle.MinRadius = 2f;
                     m6a2Ai.AccuracyModifiers.Angle.IncreaseAccuracyPerShot = false;
+
+                    MelonLogger.Msg("Better AI loaded");
                 }
+
+                /*
+                ////ERA detection for BUSK designation
+                foreach (GameObject armor_go in GameObject.FindGameObjectsWithTag("Penetrable"))
+                {
+                    if (!armor_go.transform.parent.GetComponent<LateFollow>()) continue;
+
+                    string name = armor_go.GetComponent<LateFollow>().ParentUnit.UniqueName;
+
+                    if (name != "M2BRADLEY")
+                    {
+                        if (armor_go.name == "HULL")
+                        {
+                            if (armor_go.transform.Find("Hull Front Alu 5083/M2 Hull ERA Array(Clone)"))
+                            {
+                                vic._friendlyName += " BUSK";
+                            }
+                        }
+                    }
+                }*/
             }
+
             yield break;
         }
 
-
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
+        public static void Init()
         {
-            if (sceneName == "MainMenu2_Scene" || sceneName == "LOADER_MENU" || sceneName == "MainMenu2-1_Scene" || sceneName == "LOADER_INITIAL" || sceneName == "t64_menu") return;
-
             if (ammo_M919 == null)
             {
                 foreach (AmmoCodexScriptable s in Resources.FindObjectsOfTypeAll(typeof(AmmoCodexScriptable)))
@@ -533,7 +595,38 @@ namespace M6A2Adats
                     if (era_optimizations_adats.Count == era_names.Length) break;
                 }
 
-                // M919  APFSDS-T
+                int apCapacity = apCount.Value;
+                int heCapacity = heCount.Value;
+                MelonLogger.Msg("Total AP/HE Count: " + (apCapacity + heCapacity));
+
+                if ((apCapacity + heCapacity) > 1500)
+                {
+                    apCapacity = 300;
+                    heCapacity = 1200;
+                    MelonLogger.Msg("Invalid total AP/HE amount, defaulting to 300 AP/1200 HE");
+                }
+
+                // M791 APFSDS-T
+
+                ammo_M791m6 = new AmmoType();
+                Util.ShallowCopy(ammo_M791m6, ammo_m791);
+                ammo_M791m6.Name = "M791 APDS-T";
+
+                ammo_codex_M791m6 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
+                ammo_codex_M791m6.AmmoType = ammo_M791m6;
+                ammo_codex_M791m6.name = "ammo_M791m6";
+
+                clip_M791m6 = new AmmoType.AmmoClip();
+                clip_M791m6.Capacity = apCapacity;
+                clip_M791m6.Name = "M791 APDS-T";
+                clip_M791m6.MinimalPattern = new AmmoCodexScriptable[1];
+                clip_M791m6.MinimalPattern[0] = ammo_codex_M791m6;
+
+                clip_codex_M791m6 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
+                clip_codex_M791m6.name = "clip_M791m6";
+                clip_codex_M791m6.ClipType = clip_M791m6;
+
+                // M919 APFSDS-T
 
                 ammo_M919 = new AmmoType();
                 Util.ShallowCopy(ammo_M919, ammo_m791);
@@ -542,8 +635,8 @@ namespace M6A2Adats
                 ammo_M919.RhaPenetration = 102f;
                 ammo_M919.MuzzleVelocity = 1390f;
                 ammo_M919.Mass = 0.134f;
-                /*ammo_M919.SpallMultiplier = 1.5f;
                 ammo_M919.CertainRicochetAngle = 5;
+                /*ammo_M919.SpallMultiplier = 1.5f;
                 ammo_M919.MaxSpallRha = 16;
                 ammo_M919.MinSpallRha = 4;*/
 
@@ -552,7 +645,7 @@ namespace M6A2Adats
                 ammo_codex_M919.name = "ammo_M919";
 
                 clip_M919 = new AmmoType.AmmoClip();
-                clip_M919.Capacity = 300;
+                clip_M919.Capacity = apCapacity;
                 clip_M919.Name = "M919 APFSDS-T";
                 clip_M919.MinimalPattern = new AmmoCodexScriptable[1];
                 clip_M919.MinimalPattern[0] = ammo_codex_M919;
@@ -573,12 +666,14 @@ namespace M6A2Adats
                 ammo_ADATS.Tandem = true;
                 ammo_ADATS.SpallMultiplier = 1.5f;
                 ammo_ADATS.TurnSpeed = 2.5f;
-                ammo_ADATS.DetonateSpallCount = 100;
-                ammo_ADATS.MaxSpallRha = 24;
-                ammo_ADATS.MinSpallRha = 12;
+                ammo_ADATS.DetonateSpallCount = 300;
+                ammo_ADATS.MaxSpallRha = 50;
+                ammo_ADATS.MinSpallRha = 3;
                 ammo_ADATS.MaximumRange = 10000;
                 ammo_ADATS.ImpactFuseTime = 20; //max flight time is 20 secs
+                ammo_ADATS.CertainRicochetAngle = 5;
                 if (adatsTandem.Value) ammo_ADATS.ArmorOptimizations = era_optimizations_adats.ToArray<AmmoType.ArmorOptimization>();
+                ProxyFuzeADATS.AddFuzeADATS(ammo_ADATS);
 
                 ammo_codex_ADATS = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_ADATS.AmmoType = ammo_ADATS;
@@ -591,11 +686,10 @@ namespace M6A2Adats
                 clip_ADATS.MinimalPattern[0] = ammo_codex_ADATS;
 
                 clip_codex_ADATS = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_ADATS.name = "clip_TOW_2A";
+                clip_codex_ADATS.name = "clip_ADAT";
                 clip_codex_ADATS.ClipType = clip_ADATS;
 
                 // APEX APHE-T
-
                 ammo_APEX = new AmmoType();
                 Util.ShallowCopy(ammo_APEX, ammo_m792);
                 ammo_APEX.Name = "APEX APHE-T";
@@ -609,13 +703,14 @@ namespace M6A2Adats
                 ammo_APEX.DetonateSpallCount = 30;
                 ammo_APEX.MaxSpallRha = 16f;
                 ammo_APEX.MinSpallRha = 2f;
+                ammo_APEX.CertainRicochetAngle = 5;
 
                 ammo_codex_APEX = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_APEX.AmmoType = ammo_APEX;
                 ammo_codex_APEX.name = "ammo_APEX";
 
                 clip_APEX = new AmmoType.AmmoClip();
-                clip_APEX.Capacity = 1200;
+                clip_APEX.Capacity = heCapacity;
                 clip_APEX.Name = "APEX APHE-T";
                 clip_APEX.MinimalPattern = new AmmoCodexScriptable[1];
                 clip_APEX.MinimalPattern[0] = ammo_codex_APEX;
@@ -623,9 +718,65 @@ namespace M6A2Adats
                 clip_codex_APEX = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
                 clip_codex_APEX.name = "clip_APEX";
                 clip_codex_APEX.ClipType = clip_APEX;
-            }
 
+                // M920 MPAB-T
+                ammo_M920 = new AmmoType();
+                Util.ShallowCopy(ammo_M920, ammo_m792);
+                ammo_M920.Name = "M920 MPAB-T";
+                ammo_M920.Coeff = 0.1f;
+                ammo_M920.Caliber = 25;
+                ammo_M920.RhaPenetration = 15f;
+                ammo_M920.MuzzleVelocity = 1270f;
+                ammo_M920.Mass = 0.222f;
+                ammo_M920.TntEquivalentKg = 0.050f;
+                ammo_M920.SpallMultiplier = 2f;
+                ammo_M920.DetonateSpallCount = 60;
+                ammo_M920.MaxSpallRha = 32f;
+                ammo_M920.MinSpallRha = 2f;
+                ammo_M920.CertainRicochetAngle = 5;
+
+                ammo_codex_M920 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
+                ammo_codex_M920.AmmoType = ammo_M920;
+                ammo_codex_M920.name = "ammo_M920";
+
+                clip_M920 = new AmmoType.AmmoClip();
+                clip_M920.Capacity = heCapacity;
+                clip_M920.Name = "M920 MPAB-T";
+                clip_M920.MinimalPattern = new AmmoCodexScriptable[1];
+                clip_M920.MinimalPattern[0] = ammo_codex_M920;
+
+                clip_codex_M920 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
+                clip_codex_M920.name = "clip_M920";
+                clip_codex_M920.ClipType = clip_M920;
+            }
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Lowest);
+        }
+
+
+        [HarmonyPatch(typeof(GHPC.Weapons.LiveRound), "Start")]
+        public static class Airburst
+        {
+            private static void Postfix(GHPC.Weapons.LiveRound __instance)
+            {
+                {
+                    if (__instance.Info.Name != "M920 MPAB-T") return;
+
+                    FieldInfo rangedFuseTimeField = typeof(GHPC.Weapons.LiveRound).GetField("_rangedFuseCountdown", BindingFlags.Instance | BindingFlags.NonPublic);
+                    FieldInfo rangedFuseTimeActiveField = typeof(GHPC.Weapons.LiveRound).GetField("_rangedFuseActive", BindingFlags.Instance | BindingFlags.NonPublic);
+                    FieldInfo ballisticsComputerField = typeof(FireControlSystem).GetField("_bc", BindingFlags.Instance | BindingFlags.NonPublic);
+
+                    FireControlSystem FCS = __instance.Shooter.WeaponsManager.Weapons[0].FCS;
+                    BallisticComputerRepository bc = ballisticsComputerField.GetValue(FCS) as BallisticComputerRepository;
+
+                    float range = FCS.CurrentRange;
+                    float fallOff = bc.GetFallOfShot(M6A2_Adats.ammo_M920, range);
+                    float extra_distance = range > 2000 ? 19f + 3.5f : 17f;
+
+                    //funky math 
+                    rangedFuseTimeField.SetValue(__instance, bc.GetFlightTime(M6A2_Adats.ammo_M920, range + range / M6A2_Adats.ammo_M920.MuzzleVelocity * 2 + (range + fallOff) / 2000f + extra_distance));
+                    rangedFuseTimeActiveField.SetValue(__instance, true);
+                }
+            }
         }
     }
 }
